@@ -1,11 +1,11 @@
 import pygame
-import time
 
 PRETO=(0,0,0)
 BRANCO=(255,255,255)
 VERMELHO=(255,0,0)
 VERDE=(0,255,0)
 AZUL=(0,0,255)
+AMARELO=(255,255,0)
 
 LARGURAJANELA=800
 ALTURAJANELA=700
@@ -23,15 +23,17 @@ def mover(figura,dimensaojanela):
     figura['objeto'].y += figura['vel'][1]
 
 pygame.init()
+relogio=pygame.time.Clock()
 janela=pygame.display.set_mode((LARGURAJANELA,ALTURAJANELA))
-pygame.display.set_caption("animaçao")
+pygame.display.set_caption("colisão")
 
-f1={'objeto':pygame.Rect(300,80,40,80),"cor":VERMELHO,"vel":[0,-5],"forma":"ELIPSE"}
-f2={'objeto':pygame.Rect(200,200,20,20),"cor":VERDE,"vel":[5,5],"forma":"ELIPSE"}
-f3={'objeto':pygame.Rect(100,150,60,60),"cor":AZUL,"vel":[-5,5],"forma":"RETANGULO"}
-f4={'objeto':pygame.Rect(200,150,80,40),"cor":PRETO,"vel":[5,0],"forma":"RETANGULO"}
+f1={'objeto':pygame.Rect(375,80,40,80),"cor":VERMELHO,"vel":[0,2],"forma":"ELIPSE"}
+f2={'objeto':pygame.Rect(175,200,20,20),"cor":VERDE,"vel":[0,3],"forma":"ELIPSE"}
+f3={'objeto':pygame.Rect(275,150,60,60),"cor":AZUL,"vel":[0,1],"forma":"RETANGULO"}
+f4={'objeto':pygame.Rect(75,150,80,40),"cor":PRETO,"vel":[0,4],"forma":"RETANGULO"}
 
 fig=[f1,f2,f3,f4]
+bola={'objeto':pygame.Rect(270,330,30,30),"cor":AMARELO,"vel":[3,3],"forma":"BOLA"}
 
 
 
@@ -45,10 +47,12 @@ while deve_continuar:
     janela.fill(BRANCO)
     for figura in fig:
         mover(figura,(LARGURAJANELA,ALTURAJANELA))
-        if figura["forma"]=="RETANGULO":
-            pygame.draw.rect(janela,figura["cor"],figura["objeto"])
-        elif figura["forma"]=="ELIPSE":
-            pygame.draw.ellipse(janela,figura["cor"],figura["objeto"])
+        pygame.draw.rect(janela,figura["cor"],figura["objeto"])
+        mudaCor=bola["objeto"].colliderect(figura["objeto"])
+        if mudaCor:
+            bola["cor"]=figura["cor"]
+    mover(bola,(LARGURAJANELA,ALTURAJANELA))
+    pygame.draw.ellipse(janela,bola["cor"],bola["objeto"])
     pygame.display.update()
-    time.sleep(0.02)
+    relogio.tick(1000)
 pygame.quit()
