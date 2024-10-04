@@ -7,7 +7,7 @@ BRANCO=(255,255,255)
 LARGURAJANELA=700
 ALTURAJANELA=600
 VEL=6
-INTERAÇOES=30
+INTERACAO=30
 TAMANHOBLOCO=20
 
 def moverJogador(jogador,teclas,dimensaoJanela):
@@ -17,12 +17,12 @@ def moverJogador(jogador,teclas,dimensaoJanela):
     bordainf=dimensaoJanela[1]
     if teclas["esquerda"]and jogador["objeto"].left>bordaesq:
         jogador["objeto"].x-=jogador["vel"]
-    if teclas["direita"]and jogador["objeto"].left>bordadir:
-        jogador["objeto"].x-=jogador["vel"]
+    if teclas["direita"]and jogador["objeto"].left<bordadir:
+        jogador["objeto"].x+=jogador["vel"]
     if teclas["cima"]and jogador["objeto"].left>bordasup:
         jogador["objeto"].y-=jogador["vel"]
-    if teclas["baixo"]and jogador["objeto"].left>bordainf:
-        jogador["objeto"].y-=jogador["vel"]
+    if teclas["baixo"]and jogador["objeto"].left<bordainf:
+        jogador["objeto"].y+=jogador["vel"]
 
 def moverBloco(bloco):
     bloco["objeto"].y +=bloco["vel"]
@@ -44,37 +44,31 @@ while deve_continuar:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             deve_continuar=False
-    if event.type==pygame.KEYDOWN:
-        if event.key== pygame.K_ESCAPE:
-            deve_continuar=True
-        if event.key== pygame.K_LEFT or event.key==pygame.K_a:
-            deve_continuar=True
-        if event.key== pygame.K_RIGHT or event.key==pygame.K_d:
-            deve_continuar=True
-        if event.key== pygame.K_UP or event.key==pygame.K_w:
-            deve_continuar=True
-        if event.key== pygame.K_DOWN or event.key==pygame.K_s:
-            deve_continuar=True
-    if event.type==pygame.KEYUP:
-        if event.key== pygame.K_LEFT or event.key==pygame.K_a:
-            deve_continuar=False
-        if event.key== pygame.K_RIGHT or event.key==pygame.K_d:
-            deve_continuar=False
-        if event.key== pygame.K_UP or event.key==pygame.K_w:
-            deve_continuar=False
-        if event.key== pygame.K_DOWN or event.key==pygame.K_s:
-            deve_continuar=False
+
+    teclas=pygame.key.get_pressed()
+    teclas={
+        "esquerda":teclas[pygame.K_LEFT] or teclas[pygame.K_a],
+        "direita":teclas[pygame.K_RIGHT] or teclas[pygame.K_d],
+        "cima":teclas[pygame.K_UP] or teclas[pygame.K_w],
+        "baixo":teclas[pygame.K_DOWN] or teclas[pygame.K_s]
+    }
+
     if event.type==pygame.MOUSEBUTTONDOWN:
-        blocos.append({"objeto":pygame.Rec(event.pos[0],event.pos[1],TAMANHOBLOCO,TAMANHOBLOCO),"cor":BRANCO,"vel":1})
+        blocos.append({"objeto":pygame.Rect(event.pos[0],event.pos[1],TAMANHOBLOCO,TAMANHOBLOCO),"cor":BRANCO,"vel":1})
+
+
     contador+=1
-    if contador>=INTERAÇOES:
+    if contador>=INTERACAO:
         contador=0
-        posX=random.randint(0,(LARGURAJANELA,ALTURAJANELA))
+        posX=random.randint(0,(LARGURAJANELA-TAMANHOBLOCO))
         posy= -TAMANHOBLOCO
-        velRandom=random.random(1,VEL+3)
-        blocos.append({"objeto":pygame.Rec(posX,posy,TAMANHOBLOCO,TAMANHOBLOCO),"cor":BRANCO,"vel":1})
+        velRandom=random.randint(1,VEL+3)
+        blocos.append({"objeto":pygame.Rect(posX,posy,TAMANHOBLOCO,TAMANHOBLOCO),"cor":BRANCO,"vel":1})
+
     janela.fill(PRETO)    
+
     moverJogador(jogador,teclas,(LARGURAJANELA,ALTURAJANELA))
+
     pygame.draw.rect(janela,jogador["cor"],jogador["objeto"])
 
     for bloco in blocos:
@@ -84,7 +78,8 @@ while deve_continuar:
 
     for bloco in blocos:
         moverBloco(bloco)
-        pygame.draw.circle(janela,bloco["cor"],bloco["objeto"])    
+        pygame.draw.rect(janela,bloco["cor"],bloco["objeto"])    
+
     pygame.display.update()
     relogio.tick(60)
 
